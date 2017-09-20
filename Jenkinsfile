@@ -153,7 +153,8 @@ stage("Testing") {
                               for item in ${offlist}; do 
                                   cp --parents -r sources/$item $PREFIX
                               done
-                         
+                              popd 
+                                    
                               pwd
                               ls
 
