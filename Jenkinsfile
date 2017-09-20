@@ -81,7 +81,7 @@ stage("Initialization") {
     }
 }
 
-def machineList = ["dom"] //, "daint", "leone", "kesch", "monch"]
+def machineList = ["dom" , "daint"] // "leone", "kesch", "monch"]
 
 stage("Testing") {
     for (m in machineList) {
