@@ -155,6 +155,7 @@ stage("Testing") {
                               done
                          
                               pwd
+                              ls
 
                               # --- BUILD ---
                               if [[ "$system" =~ "daint" || "$system" =~ "dom" ]]; then
