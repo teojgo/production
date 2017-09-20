@@ -47,7 +47,7 @@ MachineConfiguration getMachineConfiguration(String message, String machine) {
         }
     }
     else if (message ==~ machineMC) {
-        return MachineCongiguration.MC
+        return MachineConfiguration.MC
     }
      
     return MachineConfiguration.BOTH
