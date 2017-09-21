@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def config = load 'Machineconfiguration.groovy'
+def funcs 
 
 /*
 enum Machine {
@@ -26,7 +26,8 @@ enum Machine {
 def builds = [:]
 
 stage("Initialization") {
-    if (config.checkWorkInProgress(env.ghprbPullTitle)) {
+    funcs = load 'MachineConfiguration.groovy'
+    if (funcs.checkWorkInProgress(env.ghprbPullTitle)) {
         println "Work in progress, aborting..."
         return 
     }
@@ -36,6 +37,7 @@ def machineList = ["dom" , "daint"] // "leone", "kesch", "monch"]
 
 stage("Testing") {
     for (m in machineList) {
+        funcs = load 'MachineConfiguration.groovy'
         def machine = m 
         def pullRequestMessage = env.ghprbPullTitle
         def runForMachine = config.machineCheck(pullRequestMessage, machine)
