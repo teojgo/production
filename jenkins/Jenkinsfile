@@ -54,7 +54,7 @@ boolean checkWorkInProgress(String message) {
 /*--------------------------------------------------------------------------
 ---------------------------------- STAGES ----------------------------------
 --------------------------------------------------------------------------*/
-def testScript = "unittest.sh"
+
 def builds = [:]
 
 stage("Initialization") {
@@ -123,7 +123,9 @@ stage("Testing") {
                              "arch_list=${arch_list}",
                              "project_name=${project_name}"]) {
 
-                        sh "./${testScript}"
+                        sh '''chmod +x $PWD/jenkins/unittest.sh
+                              $PWD/jenkins/unittest.sh
+                           ''' 
                     }
                 }
             }
