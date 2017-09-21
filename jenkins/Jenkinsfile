@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+def config = load 'Machineconfiguration.groovy'
+
 /*
 enum Machine {
     DOM("dom"),
@@ -17,40 +19,25 @@ enum Machine {
 }
 */
 
-enum MachineConfiguration {
-    MC("mc"),
-    GPU("gpu"),
-    BOTH("gpu mc")
-    
-    private final configuration
 
-    MachineConfiguration(String conf) {
-        configuration = conf
-    }
-
-    String toString() {
-        return configuration
-    }
-}
-
-MachineConfiguration getMachineConfiguration(String message, String machine) {
+config.MachineConfiguration getMachineConfiguration(String message, String machine) {
     def machinePattern = ".*${machine}.*"
     def machineGPU = ".*${machine}-gpu.*"
     def machineMC = ".*${machine}-mc.*"
 
     if (message ==~ machineGPU) {
         if (message ==~ machineMC) {
-            return MachineConfiguration.BOTH
+            return config.MachineConfiguration.BOTH
         }
         else {
-            return MachineConfiguration.GPU
+            return config.MachineConfiguration.GPU
         }
     }
     else if (message ==~ machineMC) {
         return MachineConfiguration.MC
     }
      
-    return MachineConfiguration.BOTH
+    return config.MachineConfiguration.BOTH
 }
 
 boolean machineCheck(String message, String machine) {
