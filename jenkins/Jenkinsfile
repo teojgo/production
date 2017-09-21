@@ -142,9 +142,6 @@ stage("Testing") {
                               done
                               popd 
                                     
-                              pwd
-                              ls
-
                               # --- BUILD ---
                               if [[ "$system" =~ "daint" || "$system" =~ "dom" ]]; then
                                   for ARCH in ${arch_list}; do
