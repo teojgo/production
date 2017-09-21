@@ -47,3 +47,5 @@ boolean checkWorkInProgress(String message) {
     
     return false
 }
+
+return this
