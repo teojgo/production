@@ -1,33 +1,64 @@
 #!/usr/bin/env groovy
 
-def funcs 
-
-/*
-enum Machine {
-    DOM("dom"),
-    DAINT("daint")
-
-    private final name
-
-    Machine(String machineName) {
-        name = machineName
-    }
+enum MachineConfiguration {
+    MC("mc"),
+    GPU("gpu"),
+    BOTH("gpu mc")
     
+    private final configuration
+
+    MachineConfiguration(String conf) {
+        configuration = conf
+    }
+
     String toString() {
-        return name
+        return configuration
     }
 }
-*/
 
-/*-------------------------------------------------------------------
-------------------------- STAGES ------------------------------------ 
--------------------------------------------------------------------*/
+MachineConfiguration getMachineConfiguration(String message, String machine) {
+    def machinePattern = ".*${machine}.*"
+    def machineGPU = ".*${machine}-gpu.*"
+    def machineMC = ".*${machine}-mc.*"
+
+    if (message ==~ machineGPU) {
+        if (message ==~ machineMC) {
+            return MachineConfiguration.BOTH
+        }
+        else {
+            return MachineConfiguration.GPU
+        }
+    }
+    else if (message ==~ machineMC) {
+        return MachineConfiguration.MC
+    }
+     
+    return MachineConfiguration.BOTH
+}
+
+boolean machineCheck(String message, String machine) {
+    def machinePattern = ".*${machine}.*"
+    
+    return message ==~ machinePattern? true : false 
+}
+
+boolean checkWorkInProgress(String message) {
+    if (message ==~ /.*WIP.*/) {
+        return true
+    }
+    
+    return false
+}
+
+
+/*--------------------------------------------------------------------------
+---------------------------------- STAGES ----------------------------------
+--------------------------------------------------------------------------*/
 
 def builds = [:]
 
 stage("Initialization") {
-    funcs = load 'MachineConfiguration.groovy'
-    if (funcs.checkWorkInProgress(env.ghprbPullTitle)) {
+    if (checkWorkInProgress(env.ghprbPullTitle)) {
         println "Work in progress, aborting..."
         return 
     }
@@ -37,10 +68,9 @@ def machineList = ["dom" , "daint"] // "leone", "kesch", "monch"]
 
 stage("Testing") {
     for (m in machineList) {
-        funcs = load 'MachineConfiguration.groovy'
         def machine = m 
         def pullRequestMessage = env.ghprbPullTitle
-        def runForMachine = config.machineCheck(pullRequestMessage, machine)
+        def runForMachine = machineCheck(pullRequestMessage, machine)
 
         if (runForMachine) {
             println "Machine ${machine} is added to stage"
@@ -81,7 +111,11 @@ stage("Testing") {
                         default:
                             break
                     }
-    
+
+                    /*--------------------------------------------------------------------------
+                    ---------------------------------- SCRIPT ---------------------------------- 
+                    --------------------------------------------------------------------------*/
+
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                              "system=${machine}",
                              "command=${command}",
