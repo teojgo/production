@@ -1,5 +1,9 @@
 #!/usr/bin/env groovy
 
+/*--------------------------------------------------------------------------
+---------------------------------- ENUMS -----------------------------------
+--------------------------------------------------------------------------*/
+
 enum MachineConfiguration {
     MC("mc"),
     GPU("gpu"),
@@ -15,6 +19,10 @@ enum MachineConfiguration {
         return configuration
     }
 }
+
+/*--------------------------------------------------------------------------
+--------------------------------- METHODS ----------------------------------
+--------------------------------------------------------------------------*/
 
 MachineConfiguration getMachineConfiguration(String message, String machine) {
     def machinePattern = ".*${machine}.*"
@@ -59,12 +67,15 @@ def builds = [:]
 
 stage("Initialization") {
     if (checkWorkInProgress(env.ghprbPullTitle)) {
-        println "Work in progress, aborting..."
+        println "Work in progress detected, aborting execution..."
         return 
     }
 }
 
 def machineList = ["dom" , "daint"] // "leone", "kesch", "monch"]
+def bashCommand = """chmod +x \$PWD/${bashScript}
+                     \$PWD/${bashScript}
+                  """
 
 stage("Testing") {
     for (m in machineList) {
@@ -123,9 +134,9 @@ stage("Testing") {
                              "arch_list=${arch_list}",
                              "project_name=${project_name}"]) {
 
-                        sh '''chmod +x $PWD/jenkins/unittest.sh
-                              $PWD/jenkins/unittest.sh
-                           ''' 
+                        sh bashCommand 
+                              
+                            
                     }
                 }
             }
