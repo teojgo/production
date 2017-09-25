@@ -73,9 +73,11 @@ stage("Initialization") {
 }
 
 def machineList = ["dom" , "daint"] // "leone", "kesch", "monch"]
-def bashCommand = """chmod +x \$PWD/${bashScript}
-                     \$PWD/${bashScript}
+def bashCommand = """chmod +x \$PWD/${params.bashScript}
+                     \$PWD/${params.bashScript}
                   """
+
+println bashCommand
 
 stage("Testing") {
     for (m in machineList) {
