@@ -82,8 +82,6 @@ def bashCommand = """chmod +x \$PWD/${params.bashScript}
                      \$PWD/${params.bashScript}
                   """
 
-println bashCommand
-
 stage("Testing") {
     for (m in machineList) {
         def machine = m
@@ -110,7 +108,6 @@ stage("Testing") {
                         default:
                             break
                     }
-                    println "Running for configurations: $arch_list"
 
                     /*--------------------------------------------------------------------------
                     ---------------------------------- SCRIPT ---------------------------------- 
