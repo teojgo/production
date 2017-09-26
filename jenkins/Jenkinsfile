@@ -89,7 +89,7 @@ stage("Machine Selection"){
     machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})\
                                .collectEntries({it == Machine.DAINT || it == Machine.DOM ?\
                                [it, getMachineConfiguration(pullRequestMessage, it.name)] :\
-                               [it, ""]}) 
+                               [it, ""]}).collect() 
 }
 
 stage("Testing") {
@@ -100,8 +100,8 @@ stage("Testing") {
         
         println "Running for ${machineName}"
 
-        builds[machine.name] = {
-            node(machine.name) {
+        builds[machineName] = {
+            node(machineName) {
                 println "Hello from machine ${machineName}"     
                 def scmVars = checkout scm
                 def commitHash = scmVars.GIT_COMMIT   
