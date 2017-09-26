@@ -86,13 +86,16 @@ def pullRequestMessage = env.ghprbPullTitle
 def machinesToRun
 
 stage("Machine Selection"){
-    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})
+    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})\
+                               .collectEntries({it == Machine.DAINT || it == Machine.DOM ?\
+                               [it, getMachineConfiguration(pullRequestMessage, it.name)] :\
+                               [it, ""]}) 
 }
 
 stage("Testing") {
     for (m in machinesToRun) {
-        def machine = m
-        def machineName = m.name 
+        def machine = m.key
+        def machineName = machine.name 
 
         println "Running for ${machineName}"
 
@@ -102,16 +105,7 @@ stage("Testing") {
                 def scmVars = checkout scm
                 def commitHash = scmVars.GIT_COMMIT   
                 def project_name = env.JOB_BASE_NAME.trim() 
-                def arch_list = ""
-                switch(machine){
-                    case Machine.DAINT:
-                    case Machine.DOM:
-                        arch_list = getMachineConfiguration(pullRequestMessage, 
-                                    machineName)                            
-                        break 
-                    default:
-                        break
-                }
+                def arch_list = m.value 
 
                 /*--------------------------------------------------------------------------
                 ---------------------------------- SCRIPT ---------------------------------- 
