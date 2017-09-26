@@ -85,8 +85,8 @@ def bashCommand = """chmod +x \$PWD/${params.bashScript}
 def pullRequestMessage = env.ghprbPullTitle
 def machinesToRun
 
-stage("Machine Choice"){
-    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name})
+stage("Machine Selection"){
+    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})
 }
 
 stage("Testing") {
