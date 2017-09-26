@@ -83,17 +83,22 @@ def bashCommand = """chmod +x \$PWD/${params.bashScript}
                   """
 
 def pullRequestMessage = env.ghprbPullTitle
-def machinesToRun
+def machineConfigurations = [:]
 
 stage("Machine Selection"){
-    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})\
-                               .collectEntries({it == Machine.DAINT || it == Machine.DOM ?\
-                               [it, getMachineConfiguration(pullRequestMessage, it.name)] :\
-                               [it, ""]}).collect() 
+    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})
+    for (m in machinesToRun) {
+        if( m == Machine.DOM || m == Machine.DAINT) {
+            machineConfigurations[m.name] = getMachineConfiguration(pullRequestMessage, m.name)
+        }
+        else {
+            machineConfigurations[m.name] = ""
+        }
+    }
 }
 
 stage("Testing") {
-    for (m in machinesToRun) {
+    for (m in machineConfigurations) {
         def machine = m.key
         def machineName = machine.name 
         def archList = m.value
