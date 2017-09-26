@@ -82,51 +82,51 @@ def bashCommand = """chmod +x \$PWD/${params.bashScript}
                      \$PWD/${params.bashScript}
                   """
 
+def pullRequestMessage = env.ghprbPullTitle
+def machinesToRun
+
+stage("Machine Choice"){
+    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name})
+}
+
 stage("Testing") {
-    for (m in machineList) {
+    for (m in machinesToRun) {
         def machine = m
         def machineName = m.name 
-        def pullRequestMessage = env.ghprbPullTitle
-        def runForMachine = machineCheck(pullRequestMessage, machineName)
 
-        if (runForMachine) {
-            println "Machine ${machineName} is added to stage"
+        println "Running for ${machineName}"
 
-            builds[machine.name] = {
-                node(machine.name) {
-                    println "Hello from machine ${machineName}"     
-                    def scmVars = checkout scm
-                    def commitHash = scmVars.GIT_COMMIT   
-                    def project_name = env.JOB_BASE_NAME.trim() 
-                    def arch_list = ""
-                    switch(machine){
-                        case Machine.DAINT:
-                        case Machine.DOM:
-                            arch_list = getMachineConfiguration(pullRequestMessage, 
-                                        machineName)                            
-                            break 
-                        default:
-                            break
-                    }
+        builds[machine.name] = {
+            node(machine.name) {
+                println "Hello from machine ${machineName}"     
+                def scmVars = checkout scm
+                def commitHash = scmVars.GIT_COMMIT   
+                def project_name = env.JOB_BASE_NAME.trim() 
+                def arch_list = ""
+                switch(machine){
+                    case Machine.DAINT:
+                    case Machine.DOM:
+                        arch_list = getMachineConfiguration(pullRequestMessage, 
+                                    machineName)                            
+                        break 
+                    default:
+                        break
+                }
 
-                    /*--------------------------------------------------------------------------
-                    ---------------------------------- SCRIPT ---------------------------------- 
-                    --------------------------------------------------------------------------*/
+                /*--------------------------------------------------------------------------
+                ---------------------------------- SCRIPT ---------------------------------- 
+                --------------------------------------------------------------------------*/
 
-                    withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                             "system=${machineName}",
-                             "command=${machine.command}",
-                             "unuse_path=${machine.unusePath}",
-                             "arch_list=${arch_list}",
-                             "project_name=${project_name}"]) {
+                withEnv(["GIT_COMMIT=${commitHash[0..6]}",
+                         "system=${machineName}",
+                         "command=${machine.command}",
+                         "unuse_path=${machine.unusePath}",
+                         "arch_list=${arch_list}",
+                         "project_name=${project_name}"]) {
 
-                        sh bashCommand 
-                    }
+                    sh bashCommand 
                 }
             }
-        }   
-        else {
-            println "Machine ${machine} was not added to stage"
         }
     }
     parallel builds
