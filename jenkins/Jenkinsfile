@@ -96,7 +96,8 @@ stage("Testing") {
     for (m in machinesToRun) {
         def machine = m.key
         def machineName = machine.name 
-
+        def archList = m.value
+        
         println "Running for ${machineName}"
 
         builds[machine.name] = {
@@ -105,7 +106,6 @@ stage("Testing") {
                 def scmVars = checkout scm
                 def commitHash = scmVars.GIT_COMMIT   
                 def project_name = env.JOB_BASE_NAME.trim() 
-                def arch_list = m.value 
 
                 /*--------------------------------------------------------------------------
                 ---------------------------------- SCRIPT ---------------------------------- 
@@ -115,7 +115,7 @@ stage("Testing") {
                          "system=${machineName}",
                          "command=${machine.command}",
                          "unuse_path=${machine.unusePath}",
-                         "arch_list=${arch_list}",
+                         "arch_list=${archList}",
                          "project_name=${project_name}"]) {
 
                     sh bashCommand 
