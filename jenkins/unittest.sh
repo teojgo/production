@@ -27,7 +27,7 @@ if [[ "$system" =~ "daint" || "$system" =~ "dom" ]]; then
     done
 else
     linkname=${system}
-    $command $PWD/jenkins-builds/production.sh --list=$PWD/rjenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
+    $command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
     status=$[status+$?]
     echo $linkname
 fi 

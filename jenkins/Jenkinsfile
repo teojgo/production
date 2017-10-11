@@ -29,7 +29,7 @@ stage("Machine Selection"){
                         pullRequestMessage, m.name)])
             }
             else {
-                machineConfigurations.add([machine:m, partitions: ""])
+                machineConfigurations.add([machine:m, partitions: [""]])
             }
         }
     }
@@ -43,24 +43,27 @@ stage("Testing") {
     for (m in machineConfigurations) {
         def machine = m.machine 
         def machineName = machine.name 
-        def archList = m.partitions 
-
-        builds[machineName] = {
-            node(machineName) {
-                println "Hello from machine ${machineName}"     
-                def scmVars = checkout scm
-                def commitHash = scmVars.GIT_COMMIT   
-                def project_name = env.JOB_BASE_NAME.trim() 
-                /*------------------------------------------------------
-                ------------------------ SCRIPT ------------------------ 
-                -------------------------------------------------------*/
-                withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                         "system=${machineName}",
-                         "command=${machine.command}",
-                         "unuse_path=${machine.unuse_path}",
-                         "arch_list=${archList}",
-                         "project_name=${project_name}"]) {
-                    sh bashCommand 
+        def partitions = m.partitions
+        for (p in partitions) {       
+            def machineLabel = ""
+            if (p != "")  
+                machineLabel = "${machineName}-${p}"
+            builds[machineLabel] = {
+                node(machineName) {
+                    println "Hello from machine ${machineLabel}"     
+                    def scmVars = checkout scm
+                    def commitHash = scmVars.GIT_COMMIT   
+                    def project_name = env.JOB_BASE_NAME.trim() 
+                    /*------------------------------------------------------
+                    ------------------------ SCRIPT ------------------------ 
+                    -------------------------------------------------------*/
+                    withEnv(["GIT_COMMIT=${commitHash[0..6]}",
+                             "system=${machineLabel}",
+                             "command=${machine.command}",
+                             "unuse_path=${machine.unuse_path}",
+                             "project_name=${project_name}"]) {
+                        sh bashCommand 
+                    }
                 }
             }
         }

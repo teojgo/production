@@ -1,21 +1,21 @@
-String getMachineConfiguration(String message, String machine) {
+String[] getMachineConfiguration(String message, String machine) {
     def machinePattern = ".*${machine}.*"
     def machineGPU = ".*${machine}-gpu.*"
     def machineMC = ".*${machine}-mc.*"
 
     if (message ==~ machineGPU) {
         if (message ==~ machineMC) {
-            return "gpu mc" 
+            return ["gpu", "mc"] 
         }
         else {
-            return "gpu" 
+            return ["gpu"]
         }
     }
     else if (message ==~ machineMC) {
-        return "mc"
+        return ["mc"]
     }
      
-    return "gpu mc"
+    return ["gpu", "mc"]
 }
 
 boolean machineCheck(String message, String machine) {
