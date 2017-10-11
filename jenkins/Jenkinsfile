@@ -45,7 +45,7 @@ stage("Testing") {
         def machineName = machine.name 
         def partitions = m.partitions
         for (p in partitions) {       
-            def machineLabel = ""
+            def machineLabel = machineName 
             if (p != "")  
                 machineLabel = "${machineName}-${p}"
             builds[machineLabel] = {
