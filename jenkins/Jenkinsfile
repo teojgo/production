@@ -1,110 +1,49 @@
 #!/usr/bin/env groovy
 
-/*--------------------------------------------------------------------------
----------------------------------- ENUMS -----------------------------------
---------------------------------------------------------------------------*/
-
-enum Machine{
-    DAINT("daint", 'srun -u --constraint=ARCH --job-name=$project_name --time=24:00:00',
-          '$APPS/UES/jenkins/6.0.UP02/ARCH/easybuild/modules/all'),
-    DOM("dom", 'srun -u --constraint=ARCH --job-name=$project_name --time=24:00:00',
-        '$APPS/UES/jenkins/6.0.UP04/ARCH/easybuild/modules/all'),
-    LEONE("leone", "", '$APPS/UES/RH7.3_PE17.02/modules/all/'), 
-    KESCH("kesch", "", '$APPS/UES/PrgEnv-gnu-2016b'), 
-    MONCH("monch", "", '$APPS/UES/jenkins/RH6.9-17.06/easybuild/modules/all/')
-
-    final String name
-    final String command
-    final String unusePath
-
-    Machine(name, command, unusePath){
-        this.name = name
-        this.command = command
-        this.unusePath = unusePath
-    }
-}
-
-/*--------------------------------------------------------------------------
---------------------------------- METHODS ----------------------------------
---------------------------------------------------------------------------*/
-
-String getMachineConfiguration(String message, String machine) {
-    def machinePattern = ".*${machine}.*"
-    def machineGPU = ".*${machine}-gpu.*"
-    def machineMC = ".*${machine}-mc.*"
-
-    if (message ==~ machineGPU) {
-        if (message ==~ machineMC) {
-            return "gpu mc" 
-        }
-        else {
-            return "gpu" 
-        }
-    }
-    else if (message ==~ machineMC) {
-        return "mc"
-    }
-     
-    return "gpu mc"
-}
-
-boolean machineCheck(String message, String machine) {
-    def machinePattern = ".*${machine}.*"
-    
-    return message ==~ machinePattern? true : false 
-}
-
-boolean checkWorkInProgress(String message) {
-    if (message ==~ /.*WIP.*/) {
-        return true
-    }
-    
-    return false
-}
-
-
-/*--------------------------------------------------------------------------
----------------------------------- STAGES ----------------------------------
---------------------------------------------------------------------------*/
-
-def builds = [:]
-
+def methods
 stage("Initialization") {
-    if (checkWorkInProgress(env.ghprbPullTitle)) {
-        println "Work in progress detected, aborting execution..."
-        return 
+    node{
+        def root_dir = pwd()
+        methods = load("${root_dir}/jenkins/util.groovy")
+        if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
+            println "Work in progress detected, aborting execution..."
+            return 
+        }
     }
 }
 
-def machineList = [Machine.DOM, Machine.DAINT]
+def pullRequestMessage = env.ghprbPullTitle
+def machineConfigurations = [] 
+def machinesList
+stage("Machine Selection"){
+    node{    
+        def root_dir = pwd()
+        machinesList = load("${root_dir}/jenkins/Machines.groovy")
+        def machinesToRun = machinesList.findAll(
+            {methods.machineCheck(pullRequestMessage, it.name)})
+
+        for (m in machinesToRun) {
+            if( m.name == "dom" || m.name == "daint") {
+                machineConfigurations.add(
+                    [machine:m, partitions: methods.getMachineConfiguration(
+                        pullRequestMessage, m.name)])
+            }
+            else {
+                machineConfigurations.add([machine:m, partitions: ""])
+            }
+        }
+    }
+}
 
 def bashCommand = """chmod +x \$PWD/${params.bashScript}
                      \$PWD/${params.bashScript}
                   """
-
-def pullRequestMessage = env.ghprbPullTitle
-def machineConfigurations = [:]
-def machinesToRun
-
-stage("Machine Selection"){
-    machinesToRun = machineList.findAll({machineCheck(pullRequestMessage, it.name)})
-    for (m in machinesToRun) {
-        if( m == Machine.DOM || m == Machine.DAINT) {
-            machineConfigurations[m.name] = getMachineConfiguration(pullRequestMessage, m.name)
-        }
-        else {
-            machineConfigurations[m.name] = ""
-        }
-    }
-}
-
+def builds = [:]
 stage("Testing") {
     for (m in machineConfigurations) {
-        def machine = m.key
+        def machine = m.machine 
         def machineName = machine.name 
-        def archList = m.value
-        
-        println "Running for ${machineName}"
+        def archList = m.partitions 
 
         builds[machineName] = {
             node(machineName) {
@@ -112,18 +51,15 @@ stage("Testing") {
                 def scmVars = checkout scm
                 def commitHash = scmVars.GIT_COMMIT   
                 def project_name = env.JOB_BASE_NAME.trim() 
-
-                /*--------------------------------------------------------------------------
-                ---------------------------------- SCRIPT ---------------------------------- 
-                --------------------------------------------------------------------------*/
-
+                /*------------------------------------------------------
+                ------------------------ SCRIPT ------------------------ 
+                -------------------------------------------------------*/
                 withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                          "system=${machineName}",
                          "command=${machine.command}",
-                         "unuse_path=${machine.unusePath}",
+                         "unuse_path=${machine.unuse_path}",
                          "arch_list=${archList}",
                          "project_name=${project_name}"]) {
-
                     sh bashCommand 
                 }
             }
