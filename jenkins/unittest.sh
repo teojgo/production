@@ -1,7 +1,7 @@
 #!/bin/bash -l
-PREFIX="$SCRATCH/${project_name}"
-EASYBUILD_TMPDIR=${PREFIX}/tmp
-EASYBUILD_SOURCE_PATH=${PREFIX}/sources 
+PREFIX="$SCRATCH/$project_name/$linkname/$GIT_COMMIT"
+EASYBUILD_TMPDIR=$PREFIX/tmp
+EASYBUILD_SOURCE_PATH=$PREFIX/sources 
 status=0
 
 #if [ -d $PREFIX ]; then
@@ -18,6 +18,7 @@ status=0
 #popd 
       
 echo $ARCH
+echo $PREFIX
 if [[ $ARCH == "" ]]; then
     #$command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
     echo "Hello from first if branch" 
