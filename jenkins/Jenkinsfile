@@ -47,6 +47,7 @@ stage("Testing") {
         for (p in partitions) {       
             def machineLabel = machineName 
             def arch = p
+            println "Partition ${arch}"
             if (p != "")  
                 machineLabel = "${machineName}-${p}"
             builds[machineLabel] = {

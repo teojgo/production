@@ -17,7 +17,8 @@ status=0
 #done
 #popd 
       
-if [[ $ARCH=="" ]]; then
+echo $ARCH
+if [[ $ARCH == "" ]]; then
     #$command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
     echo "Hello from first if branch" 
 else
