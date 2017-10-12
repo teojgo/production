@@ -5,7 +5,8 @@ stage("Initialization") {
     node{
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
-        if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
+        if (methods.checkWorkInProgress(env.ghprbPullTitle) 
+            && !params.regressionTest ) {
             println "Work in progress detected, aborting execution..."
             return 
         }
@@ -13,6 +14,8 @@ stage("Initialization") {
 }
 
 def pullRequestMessage = env.ghprbPullTitle
+if (params.regressionTest)
+    pullRequestMessage = "${params.customMessage}"
 def machineConfigurations = [] 
 def machinesList
 stage("Machine Selection"){
