@@ -60,7 +60,7 @@ stage("Testing") {
                     -------------------------------------------------------*/
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                              "system=${machineName}",
-                             "linkname=${machineLabel}"
+                             "linkname=${machineLabel}",
                              "command=${machine.command}",
                              "unuse_path=${machine.unuse_path}",
                              "ARCH=${arch}",
