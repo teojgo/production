@@ -13,9 +13,12 @@ stage("Initialization") {
     }
 }
 
-def pullRequestMessage = env.ghprbPullTitle
+def pullRequestMessage
 if (params.regressionTest)
     pullRequestMessage = "${params.customMessage}"
+else
+    pullRequestMessage = env.ghprbPullTitle
+
 def machineConfigurations = [] 
 def machinesList
 stage("Machine Selection"){
@@ -55,6 +58,7 @@ stage("Testing") {
                 machineLabel = "${machineName}-${p}"
             builds[machineLabel] = {
                 node(machineName) {
+                    println "Machine name: ${name}"                   
                     println "Hello from machine ${machineLabel}"     
                     def scmVars = checkout scm
                     def commitHash = scmVars.GIT_COMMIT   
