@@ -58,8 +58,8 @@ stage("Testing") {
                 machineLabel = "${machineName}-${p}"
             builds[machineLabel] = {
                 node(machineName) {
-                    println "Machine name: ${name}"                   
-                    println "Hello from machine ${machineLabel}"     
+                    println "Machine name: ${machineName}"
+                    println "Hello from machine ${machineLabel}"
                     def scmVars = checkout scm
                     def commitHash = scmVars.GIT_COMMIT   
                     def project_name = env.JOB_BASE_NAME.trim() 
