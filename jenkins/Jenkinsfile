@@ -48,6 +48,7 @@ stage("Testing") {
             def machineLabel = machineName 
             if (p != "")  
                 machineLabel = "${machineName}-${p}"
+                def arch = p
             builds[machineLabel] = {
                 node(machineName) {
                     println "Hello from machine ${machineLabel}"     
@@ -58,9 +59,11 @@ stage("Testing") {
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                             "system=${machineLabel}",
+                             "system=${machineName}",
+                             "linkname=${machineLabel}"
                              "command=${machine.command}",
                              "unuse_path=${machine.unuse_path}",
+                             "ARCH=${arch}",
                              "project_name=${project_name}"]) {
                         sh bashCommand 
                     }
