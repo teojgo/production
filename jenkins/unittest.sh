@@ -7,7 +7,7 @@ status=0
 if [ -d $PREFIX ]; then
     rm -rf $PREFIX/*
 else 
-    mkdir $PREFIX
+    mkdir -p $PREFIX
 fi
 
 offlist="a/Amber c/CPMD n/NAMD n/NCL u/UDUNITS v/VASP v/Visit"
