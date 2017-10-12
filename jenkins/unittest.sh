@@ -27,4 +27,7 @@ else
     echo "Hello from second if branch"
 fi 
 status=$[status+$?]
+
+echo "Removing $PREFIX"
+rm -rf $PREFIX
 exit ${status}
