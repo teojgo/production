@@ -1,5 +1,5 @@
 #!/bin/bash -l
-PREFIX="$SCRATCH/$project_name/$linkname/$GIT_COMMIT"
+PREFIX="$SCRATCH/$project_name/$linkname/"
 EASYBUILD_TMPDIR=$PREFIX/tmp
 EASYBUILD_SOURCE_PATH=$PREFIX/sources 
 status=0
@@ -10,23 +10,14 @@ else
     mkdir -p $PREFIX
 fi
 
-offlist="a/Amber c/CPMD n/NAMD n/NCL u/UDUNITS v/VASP v/Visit"
-pushd $HOME
-for item in ${offlist}; do 
-    cp --parents -r sources/$item $PREFIX
-done
-popd 
-      
-echo $ARCH
-echo $PREFIX
 if [[ $ARCH == "" ]]; then
-    #$command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
-    echo "Hello from first if branch" 
+    $command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
 else
-#    ${command/ARCH/$ARCH} $PWD/jenkins-builds/production.sh --arch=$ARCH --list=$PWD/jenkins-builds/${linkname} --prefix=${PREFIX}/${ARCH} --unuse=${unuse_path/ARCH/$ARCH} --xalt=no
-    echo "Hello from second if branch"
+    ${command/ARCH/$ARCH} $PWD/jenkins-builds/production.sh --arch=$ARCH --list=$PWD/jenkins-builds/${linkname} --prefix=${PREFIX} --unuse=${unuse_path/ARCH/$ARCH} --xalt=no
 fi 
 status=$[status+$?]
-echo "Removing $PREFIX"
-rm -rf $PREFIX
+
+chmod -R o+r $EASYBUILD_TMPDIR
+find $EASYBUILD_TMPDIR -type d -exec chmod o+x '{}' \;
+
 exit ${status}
