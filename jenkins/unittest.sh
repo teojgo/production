@@ -4,18 +4,18 @@ EASYBUILD_TMPDIR=$PREFIX/tmp
 EASYBUILD_SOURCE_PATH=$PREFIX/sources 
 status=0
 
-#if [ -d $PREFIX ]; then
-#    rm -rf $PREFIX/*
-#else 
-#    mkdir $PREFIX
-#fi
+if [ -d $PREFIX ]; then
+    rm -rf $PREFIX/*
+else 
+    mkdir $PREFIX
+fi
 
-#offlist="a/Amber c/CPMD n/NAMD n/NCL u/UDUNITS v/VASP v/Visit"
-#pushd $HOME
-#for item in ${offlist}; do 
-#    cp --parents -r sources/$item $PREFIX
-#done
-#popd 
+offlist="a/Amber c/CPMD n/NAMD n/NCL u/UDUNITS v/VASP v/Visit"
+pushd $HOME
+for item in ${offlist}; do 
+    cp --parents -r sources/$item $PREFIX
+done
+popd 
       
 echo $ARCH
 echo $PREFIX
