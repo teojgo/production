@@ -7,7 +7,6 @@ stage("Initialization") {
         methods = load("${root_dir}/jenkins/util.groovy")
         switch (params.jenkinsType) {
             case "testing" :
-
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
                     println "Work in progress detected, aborting..."
                     return 
@@ -59,11 +58,8 @@ stage("Machine Selection"){
     }
 }
 
-def bashCommand = """chmod +x \$PWD/${params.bashScript}
-                     \$PWD/${params.bashScript}
-                  """
 def builds = [:]
-stage("Testing") {
+stage("Build Stage") {
     for (m in machineConfigurations) {
         def machine = m.machine 
         def machineName = machine.name 
@@ -81,13 +77,37 @@ stage("Testing") {
                     def scmVars = checkout scm
                     def commitHash = scmVars.GIT_COMMIT   
                     def project_name = env.JOB_BASE_NAME.trim() 
-                    /*------------------------------------------------------
+                    def command        
+                    def bashScript
+                    switch (params.jenkinsType) {
+                        case "testing" :
+                            command = machine.testCommand 
+                            bashScript = "testing.sh"
+                            break
+                        case "production":
+                            command = machine.productionCommand 
+                            bashScript = "production.sh"
+                            break
+                        case "regression":
+                            command = machine.regressionCommand 
+                            bashScript = "regression.sh"
+                            break
+                        default:
+                            println "Jenkins type not recognized aborting..."
+                            return
+                    }
+
+                    def bashCommand = """chmod +x \$PWD/${bashScript}
+                                         \$PWD/${bashScript}
+                                      """
+                   /*------------------------------------------------------
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
+                    
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                              "system=${machineName}",
                              "linkname=${machineLabel}",
-                             "command=${machine.command}",
+                             "command=${command}",
                              "unuse_path=${machine.unuse_path}",
                              "ARCH=${arch}",
                              "project_name=${project_name}"]) {
