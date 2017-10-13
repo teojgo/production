@@ -10,7 +10,7 @@ else
     mkdir -p $PREFIX
 fi
 
-
+echo "The command to execute is $command"
 
 if [[ $ARCH == "" ]]; then
     $command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
