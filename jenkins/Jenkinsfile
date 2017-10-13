@@ -9,7 +9,6 @@ stage("Initialization") {
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
         machinesList = load("${root_dir}/jenkins/Machines.groovy") 
-        println "List of machines: $machinesList"
         switch (params.jenkinsType) {
             case "testingEB" :
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
@@ -61,6 +60,7 @@ stage("Machine Selection"){
 
 def builds = [:]
 stage("Build Stage") {
+    print "Configurations: $machineConfigurations"
     for (mach in machineConfigurations) {
         def machine = mach
         def machineName = machine.name 
