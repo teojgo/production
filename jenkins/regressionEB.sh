@@ -1,7 +1,7 @@
 #!/bin/bash -l
 PREFIX="$SCRATCH/${project_name}"
 export EASYBUILD_TMPDIR=$PREFIX/tmp
-export EASYBUILD_SOURCE_PATH=$PREFIX/sources 
+export EASYBUILD_SOURCEPATH=$PREFIX/sources 
 status=0
 
 if [ -d $PREFIX ]; then
