@@ -5,19 +5,35 @@ stage("Initialization") {
     node{
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
-        if (methods.checkWorkInProgress(env.ghprbPullTitle) 
-            && !params.regressionTest ) {
-            println "Work in progress detected, aborting execution..."
-            return 
-        }
+        switch (params.jenkinsType)
+            case "testing" :
+
+                if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
+                    println "Work in progress detected, aborting..."
+                    return 
+                }
+                break
+            case "production":
+            case "regression":
+                return
+            default:
+                println "Project type not recognized, aborting..."
+                return
     }
 }
 
-def pullRequestMessage
-if (params.regressionTest)
-    pullRequestMessage = "${params.customMessage}"
-else
-    pullRequestMessage = env.ghprbPullTitle
+def userMessage 
+switch (params.jenkinsType)
+    case "testing" :
+        userMessage = env.ghprbPullTitle
+        break
+    case "production":
+    case "regression":
+        userMessage = "${params.customMessage}"
+        break;
+    default:
+        println "Project type not recognized, aborting..."
+        return
 
 def machineConfigurations = [] 
 def machinesList
@@ -26,13 +42,13 @@ stage("Machine Selection"){
         def root_dir = pwd()
         machinesList = load("${root_dir}/jenkins/Machines.groovy")
         def machinesToRun = machinesList.findAll(
-            {methods.machineCheck(pullRequestMessage, it.name)})
+            {methods.machineCheck(userMessage, it.name)})
 
         for (m in machinesToRun) {
             if( m.name == "dom" || m.name == "daint") {
                 machineConfigurations.add(
                     [machine:m, partitions: methods.getMachineConfiguration(
-                        pullRequestMessage, m.name)])
+                        userMessage, m.name)])
             }
             else {
                 machineConfigurations.add([machine:m, partitions: [""]])
