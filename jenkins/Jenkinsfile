@@ -77,7 +77,6 @@ stage("Build Stage") {
                     println "Hello from machine ${machineLabel}"
                     def commitHash = scmVars.GIT_COMMIT   
                     def project_name = env.JOB_BASE_NAME.trim() 
-                    def command        
                     def bashScript
                     def command
                     def unuse_flag = ''
