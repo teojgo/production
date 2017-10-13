@@ -1,0 +1,135 @@
+#!/usr/bin/env groovy
+
+def methods
+def scmVars
+def machinesList
+stage("Initialization") {
+    node{
+        scmVars = checkout scm
+        def root_dir = pwd()
+        methods = load("${root_dir}/jenkins/util.groovy")
+        machinesList = load("${root_dir}/jenkins/Machines.groovy") 
+        switch (params.jenkinsType) {
+            case "testingEB" :
+                if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
+                    println "Work in progress detected, aborting..."
+                    return 
+                }
+                break
+            case "productionEB":
+            case "regressionEB":
+                return
+            default:
+                println "Project type not recognized, aborting..."
+                return
+        }
+    }
+}
+
+def userMessage 
+switch (params.jenkinsType) {
+    case "testingEB" :
+        userMessage = env.ghprbPullTitle
+        break
+    case "productionEB":
+    case "regressionEB":
+        userMessage = "${params.customMessage}"
+        break;
+    default:
+        println "Project type not recognized, aborting..."
+        return
+}
+
+def machineConfigurations = [] 
+stage("Machine Selection"){
+    node{    
+        def machinesToRun = machinesList.findAll(
+            {methods.machineCheck(userMessage, it.name)})
+        for (mach in machinesToRun) {
+            if( mach.name == "dom" || mach.name == "daint") {
+                machineConfigurations.add(
+                    [machine:mach, architectures: methods.getMachineConfiguration(
+                        userMessage, mach.name)])
+            }
+            else {
+                machineConfigurations.add([machine:mach, architectures: [""]])
+            }
+        }
+    }
+}
+
+def builds = [:]
+stage("Build Stage") {
+    for (mach in machineConfigurations) {
+        def machine = mach.machine
+        def architectures = mach.architectures
+        def machineName = machine.name 
+        for (architecture in architectures) {       
+            def machineLabel = machineName 
+            def arch = architecture
+            println "Architecture ${arch}"
+            if (arch != "")  
+                machineLabel = "${machineName}-${arch}"
+            builds[machineLabel] = {
+                node(machineName) {
+                    checkout scm
+                    println "Machine name: ${machineName}"
+                    println "Hello from machine ${machineLabel}"
+                    def commitHash = scmVars.GIT_COMMIT   
+                    def project_name = env.JOB_BASE_NAME.trim() 
+                    def bashScript
+                    def command
+                    def unuse_flag = ''
+                    def working_dir = sh(returnStdout: true, 
+                                         script: 'echo $PWD').trim()
+                    def scratch = sh(returnStdout: true, 
+                                     script: 'echo $SCRATCH').trim()
+                    def prefix = "$scratch/$project_name/$machineLabel"
+                    switch (params.jenkinsType) {
+                        case "testingEB" :
+                            bashScript = "testingEB.sh"
+                            prefix = "prefix/${commitHach[0..6]}"
+                            break
+                        case "productionEB":
+                            bashScript = "productionEB.sh"
+                            if (arch == "") {
+                                //command = "$working_dir/jenkins-builds/production.sh --force=\"buildlist\" --list=$working_dir/$project_name.txt --prefix=$prefix"
+                            }
+                            else {
+                                //command = "$working_dir/jenkins-builds/production.sh --arch=$arch --force="$buildlist" --list=$working_dir/$project_name.txt --prefix=$prefix --xalt=no"
+                            }
+                            break
+                        case "regressionEB":
+                            bashScript = "regressionEB.sh"
+                            unuse_flag = "--unuse=${machine.unuse_path}".replace('ARCH', arch)                    
+                            list_flag = "--list=$working_dir/jenkins-builds/$machineLabel"
+                            if (arch == "") {
+                                command = "$working_dir/jenkins-builds/production.sh $list_flag --prefix=$prefix $unuse_flag"
+                            }
+                            else {
+                                command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 $working_dir/jenkins-builds/production.sh --arch=$arch $list_flag --prefix=$prefix $unuse_flag --xalt=no"
+                            }
+                            break
+                        default:
+                            println "Jenkins type not recognized, aborting..."
+                            return
+                    }
+                    println "Command: $command"
+                    def script_with_path = "$working_dir/jenkins/$bashScript"
+                    def bashCommand = """chmod +x $script_with_path
+                                         $script_with_path
+                                      """
+                   /*------------------------------------------------------
+                    ------------------------ SCRIPT ------------------------ 
+                    -------------------------------------------------------*/
+                    withEnv(["PREFIX=$prefix",
+                             "COMMAND=$command",
+                             "WORKING_DIR=$working_dir"]) {
+                                 sh bashCommand 
+                    }
+                }
+            }
+        }
+    }
+    parallel builds
+}
