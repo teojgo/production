@@ -10,7 +10,7 @@ else
     mkdir -p $PREFIX
 fi
 
-$command
+$(command)
 
 status=$[status+$?]
 
