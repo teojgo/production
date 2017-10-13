@@ -8,7 +8,7 @@ stage("Initialization") {
         scmVars = checkout scm
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
-        machinesList = load("${root_dir}/jenkins/Machines.groovy")
+        machinesList = load("${root_dir}/jenkins/Machines.groovy") 
         switch (params.jenkinsType) {
             case "testing" :
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
@@ -45,7 +45,6 @@ stage("Machine Selection"){
     node{    
         def machinesToRun = machinesList.findAll(
             {methods.machineCheck(userMessage, it.name)})
-
         for (m in machinesToRun) {
             if( m.name == "dom" || m.name == "daint") {
                 machineConfigurations.add(
@@ -53,7 +52,7 @@ stage("Machine Selection"){
                         userMessage, m.name)])
             }
             else {
-                machineConfigurations.add([machine:m, partitions: [""]])
+                machineConfigurations.add([machine:m.name, partitions: [""]])
             }
         }
     }
@@ -62,9 +61,9 @@ stage("Machine Selection"){
 def builds = [:]
 stage("Build Stage") {
     for (m in machineConfigurations) {
-        def machine = m.machine 
+        def machine = m
         def machineName = machine.name 
-        def partitions = m.partitions
+        def partitions = machine.partitions
         for (p in partitions) {       
             def machineLabel = machineName 
             def arch = p
@@ -80,21 +79,32 @@ stage("Build Stage") {
                     def project_name = env.JOB_BASE_NAME.trim() 
                     def command        
                     def bashScript
+                    def command
+                    def unuse_flag = ''
+                    def unuse_path = ''
                     switch (params.jenkinsType) {
-                        case "testing" :
+                        case "testingEB" :
                             bashScript = "testingEB.sh"
                             break
-                        case "production":
+                        case "productionEB":
                             bashScript = "productionEB.sh"
                             break
-                        case "regression":
+                        case "regressionEB":
                             bashScript = "regressionEB.sh"
+                            unuse_flag = "--unuse=${machine.unuse_path}"
                             break
                         default:
                             println "Jenkins type not recognized, aborting..."
                             return
                     }
-
+                    
+                    if (p == "") {
+                        command = "\$PWD/jenkins-builds/production.sh --list=\$PWD/jenkins-builds/\${linkname} --prefix=\${PREFIX} $unuse_flag"
+                    }
+                    else {
+                        command = "srun -u --constraint=$p --job-name=$project_name --time=24:00:00 \$PWD/jenkins-builds/production.sh --arch=$p --list=\$PWD/jenkins-builds/\${linkname} --prefix=\${PREFIX} $unuse_flag/ARCH/$p --xalt=no"
+                    }
+                     
                     def bashCommand = """chmod +x \$PWD/jenkins/${bashScript}
                                          \$PWD/jenkins/${bashScript}
                                       """
