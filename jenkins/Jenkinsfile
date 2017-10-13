@@ -97,10 +97,10 @@ stage("Build Stage") {
                     }
                     
                     if (arch == "") {
-                        command = "\"\$PWD/jenkins-builds/production.sh\" --list=\$PWD/jenkins-builds/${linkname} --prefix=\${PREFIX} $unuse_flag"
+                        command = "\"\$PWD/jenkins-builds/production.sh\" --list=\$PWD/jenkins-builds/$machineLabel --prefix=\${PREFIX} $unuse_flag"
                     }
                     else {
-                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 \"\$PWD/jenkins-builds/production.sh\" --arch=$arch --list=\$PWD/jenkins-builds/${linkname} --prefix=\${PREFIX} $unuse_flag/ARCH/$arch --xalt=no"
+                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 \"\$PWD/jenkins-builds/production.sh\" --arch=$arch --list=\$PWD/jenkins-builds/$machineLabel --prefix=\${PREFIX} $unuse_flag/ARCH/$arch --xalt=no"
                     }
                      
                     println "Command to execute: $command"
@@ -111,7 +111,6 @@ stage("Build Stage") {
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                             "linkname=${machineLabel}",
                              "command=${command}",
                              "project_name=${project_name}"]) {
                               
