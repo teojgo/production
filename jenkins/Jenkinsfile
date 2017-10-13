@@ -1,10 +1,12 @@
 #!/usr/bin/env groovy
 
 def methods
+def scmVars
 stage("Initialization") {
     node{
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
+        scmVars = checkout scm
         switch (params.jenkinsType) {
             case "testing" :
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
@@ -74,7 +76,6 @@ stage("Build Stage") {
                 node(machineName) {
                     println "Machine name: ${machineName}"
                     println "Hello from machine ${machineLabel}"
-                    def scmVars = checkout scm
                     def commitHash = scmVars.GIT_COMMIT   
                     def project_name = env.JOB_BASE_NAME.trim() 
                     def command        
