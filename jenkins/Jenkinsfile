@@ -98,7 +98,7 @@ stage("Build Stage") {
                     }
 
                     def bashCommand = """chmod +x \$PWD/jenkins/${bashScript}
-                                         \$PWD/${bashScript}
+                                         \$PWD/jenkins/${bashScript}
                                       """
                    /*------------------------------------------------------
                     ------------------------ SCRIPT ------------------------ 
