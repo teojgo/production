@@ -3,10 +3,9 @@
 # exit status
 status=0
 
-PREFIX="$SCRATCH/${project_name}/${linkName}/${GIT_COMMIT}"
-EASYBUILD_TMPDIR=${PREFIX}/tmp
-EASYBUILD_SOURCEPATH=${PREFIX}/sources
-EB_CUSTOM_REPOSITORY=$PWD/easybuild
+EASYBUILD_TMPDIR=$PREFIX/tmp
+EASYBUILD_SOURCEPATH=$PREFIX/sources
+EB_CUSTOM_REPOSITORY=$WORKING_DIR/easybuild
 
 # --- BUILD LIST ---
 # http://stackoverflow.com/questions/6879501/filter-git-diff-by-type-of-change
@@ -15,25 +14,19 @@ echo -e "\n Current diff list by 'git diff origin/master..HEAD --name-only --one
 git diff origin/master..HEAD --name-only --oneline --no-merges --diff-filter=ACMRTUXB
 
 if [ -z "$buildlist" ]; then
- echo -e "\n No EasyBuild recipe to build, skipping build \n"
- exit 0
+    echo -e "\n No EasyBuild recipe to build, skipping build \n"
+    exit 0
 else
- echo $buildlist | tr " " "\n" > "$PWD/${project_name}.txt"
+    echo $buildlist | tr " " "\n" > "$PWD/${project_name}.txt"
 fi
 
 
 # clean PREFIX folder
 if [ -d $PREFIX ]; then
- rm -rf $PREFIX/*
-else 
- mkdir -p $PREFIX
+    rm -rf $PREFIX/*
 fi
 
-if [[ $ARCH == "" ]] then
-    $command $PWD/jenkins-builds/production.sh --force="$buildlist" --list=$PWD/${project_name}.txt --prefix=$PREFIX
-else
-    ${command/ARCH/$ARCH} $PWD/jenkins-builds/production.sh --arch=$ARCH --force="$buildlist" --list=$PWD/${project_name}.txt --prefix=${PREFIX} --xalt=no
-fi
+$COMMAND
 
 status=$[status+$?]
 

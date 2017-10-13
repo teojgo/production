@@ -80,8 +80,10 @@ stage("Build Stage") {
                     def bashScript
                     def command
                     def unuse_flag = ''
-                    def working_dir = sh(returnStdout: true, script: 'echo $PWD').trim()
-                    def scratch = sh(returnStdout: true, script: 'echo $SCRATCH').trim()
+                    def working_dir = sh(returnStdout: true, 
+                                         script: 'echo $PWD').trim()
+                    def scratch = sh(returnStdout: true, 
+                                     script: 'echo $SCRATCH').trim()
                     def prefix = "$scratch/$project_name/$machineLabel"
                     switch (params.jenkinsType) {
                         case "testingEB" :
@@ -90,34 +92,40 @@ stage("Build Stage") {
                             break
                         case "productionEB":
                             bashScript = "productionEB.sh"
+                            if (arch == "") {
+                                //command = "$working_dir/jenkins-builds/production.sh --force=\"buildlist\" --list=$working_dir/$project_name.txt --prefix=$prefix"
+                            }
+                            else {
+                                //command = "$working_dir/jenkins-builds/production.sh --arch=$arch --force="$buildlist" --list=$working_dir/$project_name.txt --prefix=$prefix --xalt=no"
+                            }
                             break
                         case "regressionEB":
                             bashScript = "regressionEB.sh"
-                            unuse_flag = "--unuse=${machine.unuse_path}".replace('ARCH', arch)
+                            unuse_flag = "--unuse=${machine.unuse_path}".replace('ARCH', arch)                    
+                            list_flag = "--list=$working_dir/jenkins-builds/$machineLabel"
+                            if (arch == "") {
+                                command = "$working_dir/jenkins-builds/production.sh $list_flag --prefix=$prefix $unuse_flag"
+                            }
+                            else {
+                                command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 $working_dir/jenkins-builds/production.sh --arch=$arch $list_flag --prefix=$prefix $unuse_flag --xalt=no"
+                            }
                             break
                         default:
                             println "Jenkins type not recognized, aborting..."
                             return
                     }
-                    
-                    if (arch == "") {
-                        command = "$working_dir/jenkins-builds/production.sh --list=$working_dir/jenkins-builds/$machineLabel --prefix=$prefix $unuse_flag"
-                    }
-                    else {
-                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 $working_dir/jenkins-builds/production.sh --arch=$arch --list=$working_dir/jenkins-builds/$machineLabel --prefix=$prefix $unuse_flag --xalt=no"
-                    }
-                     
                     println "Command: $command"
-                    def bashCommand = """chmod +x $working_dir/jenkins/$bashScript
-                                         $working_dir/jenkins/$bashScript
+                    def script_with_path = "$working_dir/jenkins/$bashScript"
+                    def bashCommand = """chmod +x $script_with_path
+                                         $script_with_path
                                       """
                    /*------------------------------------------------------
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
                     withEnv(["PREFIX=$prefix",
-                             "command=$command"]) {
-                              
-                        sh bashCommand 
+                             "COMMAND=$command",
+                             "WORKING_DIR=$working_dir"]) {
+                                 sh bashCommand 
                     }
                 }
             }
