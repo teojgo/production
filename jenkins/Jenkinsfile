@@ -60,9 +60,8 @@ stage("Machine Selection"){
 
 def builds = [:]
 stage("Build Stage") {
-    print "Configurations: $machineConfigurations"
     for (mach in machineConfigurations) {
-        def machine = mach
+        def machine = mach.machine
         def machineName = machine.name 
         def architectures = machine.architectures
         for (architecture in architectures) {       
