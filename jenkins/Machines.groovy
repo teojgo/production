@@ -7,7 +7,7 @@ def dom = [name: 'dom',
 def kesch = [name: 'kesch',
              unuse_path: '/apps/escha/UES/generic/modulefiles:/apps/escha/UES/PrgEnv-gnu-17.02/modulefiles:/apps/escha/UES/PrgEnv-cray-17.06/modulefiles:/apps/escha/UES/experimental/modulefiles']
 
-def leone = [name: 'leone',h
+def leone = [name: 'leone',
              unuse_path: '/apps/leone/UES/PrgEnv-gnu-2016b'] 
 
 def monch = [name: 'monch',
