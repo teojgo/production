@@ -1,5 +1,5 @@
 #!/bin/bash -l
-PREFIX="$SCRATCH/$project_name/$linkname/"
+PREFIX="$SCRATCH/$project_name/$linkname"
 EASYBUILD_TMPDIR=$PREFIX/tmp
 EASYBUILD_SOURCE_PATH=$PREFIX/sources 
 status=0
@@ -9,6 +9,8 @@ if [ -d $PREFIX ]; then
 else 
     mkdir -p $PREFIX
 fi
+
+
 
 if [[ $ARCH == "" ]]; then
     $command $PWD/jenkins-builds/production.sh --list=$PWD/jenkins-builds/${linkname} --prefix=$PREFIX --unuse=${unuse_path}
