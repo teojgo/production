@@ -111,7 +111,9 @@ stage("Build Stage") {
                     -------------------------------------------------------*/
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                              "linkname=${machineLabel}",
+                             "command=${bashCommand}",
                              "project_name=${project_name}"]) {
+                              
                         sh bashCommand 
                     }
                 }
