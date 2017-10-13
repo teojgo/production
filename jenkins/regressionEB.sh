@@ -5,8 +5,6 @@ status=0
 
 if [ -d $PREFIX ]; then
     rm -rf $PREFIX/*
-else 
-    mkdir -p $PREFIX
 fi
 
 $command
