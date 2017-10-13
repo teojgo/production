@@ -10,14 +10,14 @@ stage("Initialization") {
         methods = load("${root_dir}/jenkins/util.groovy")
         machinesList = load("${root_dir}/jenkins/Machines.groovy") 
         switch (params.jenkinsType) {
-            case "testing" :
+            case "testingEB" :
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
                     println "Work in progress detected, aborting..."
                     return 
                 }
                 break
-            case "production":
-            case "regression":
+            case "productionEB":
+            case "regressionEB":
                 return
             default:
                 println "Project type not recognized, aborting..."
@@ -28,11 +28,11 @@ stage("Initialization") {
 
 def userMessage 
 switch (params.jenkinsType) {
-    case "testing" :
+    case "testingEB" :
         userMessage = env.ghprbPullTitle
         break
-    case "production":
-    case "regression":
+    case "productionEB":
+    case "regressionEB":
         userMessage = "${params.customMessage}"
         break;
     default:
@@ -45,14 +45,14 @@ stage("Machine Selection"){
     node{    
         def machinesToRun = machinesList.findAll(
             {methods.machineCheck(userMessage, it.name)})
-        for (m in machinesToRun) {
-            if( m.name == "dom" || m.name == "daint") {
+        for (mach in machinesToRun) {
+            if( mach.name == "dom" || mach.name == "daint") {
                 machineConfigurations.add(
-                    [machine:m, partitions: methods.getMachineConfiguration(
-                        userMessage, m.name)])
+                    [machine:mach, architectures: methods.getMachineConfiguration(
+                        userMessage, mach.name)])
             }
             else {
-                machineConfigurations.add([machine:m.name, partitions: [""]])
+                machineConfigurations.add([machine:mach, architectures: [""]])
             }
         }
     }
@@ -60,16 +60,16 @@ stage("Machine Selection"){
 
 def builds = [:]
 stage("Build Stage") {
-    for (m in machineConfigurations) {
-        def machine = m
+    for (mach in machineConfigurations) {
+        def machine = mach
         def machineName = machine.name 
-        def partitions = machine.partitions
-        for (p in partitions) {       
+        def architectures = machine.architectures
+        for (architecture in architectures) {       
             def machineLabel = machineName 
-            def arch = p
-            println "Partition ${arch}"
-            if (p != "")  
-                machineLabel = "${machineName}-${p}"
+            def arch = architecture
+            println "Architecture ${arch}"
+            if (part != "")  
+                machineLabel = "${machineName}-${arch}"
             builds[machineLabel] = {
                 node(machineName) {
                     checkout scm
@@ -80,7 +80,6 @@ stage("Build Stage") {
                     def bashScript
                     def command
                     def unuse_flag = ''
-                    def unuse_path = ''
                     switch (params.jenkinsType) {
                         case "testingEB" :
                             bashScript = "testingEB.sh"
@@ -97,11 +96,11 @@ stage("Build Stage") {
                             return
                     }
                     
-                    if (p == "") {
+                    if (arch == "") {
                         command = "\$PWD/jenkins-builds/production.sh --list=\$PWD/jenkins-builds/\${linkname} --prefix=\${PREFIX} $unuse_flag"
                     }
                     else {
-                        command = "srun -u --constraint=$p --job-name=$project_name --time=24:00:00 \$PWD/jenkins-builds/production.sh --arch=$p --list=\$PWD/jenkins-builds/\${linkname} --prefix=\${PREFIX} $unuse_flag/ARCH/$p --xalt=no"
+                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 \$PWD/jenkins-builds/production.sh --arch=$arch --list=\$PWD/jenkins-builds/\${linkname} --prefix=\${PREFIX} $unuse_flag/ARCH/$arch --xalt=no"
                     }
                      
                     def bashCommand = """chmod +x \$PWD/jenkins/${bashScript}
@@ -111,9 +110,7 @@ stage("Build Stage") {
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                             "system=${machineName}",
                              "linkname=${machineLabel}",
-                             "ARCH=${arch}",
                              "project_name=${project_name}"]) {
                         sh bashCommand 
                     }
