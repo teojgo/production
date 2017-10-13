@@ -62,8 +62,8 @@ def builds = [:]
 stage("Build Stage") {
     for (mach in machineConfigurations) {
         def machine = mach.machine
+        def architectures = mach.architectures
         def machineName = machine.name 
-        def architectures = machine.architectures
         for (architecture in architectures) {       
             def machineLabel = machineName 
             def arch = architecture
