@@ -2,11 +2,13 @@
 
 def methods
 def scmVars
+def machinesList
 stage("Initialization") {
     node{
         scmVars = checkout scm
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
+        machinesList = load("${root_dir}/jenkins/Machines.groovy")
         switch (params.jenkinsType) {
             case "testing" :
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
@@ -39,11 +41,8 @@ switch (params.jenkinsType) {
 }
 
 def machineConfigurations = [] 
-def machinesList
 stage("Machine Selection"){
     node{    
-        def root_dir = pwd()
-        machinesList = load("${root_dir}/jenkins/Machines.groovy")
         def machinesToRun = machinesList.findAll(
             {methods.machineCheck(userMessage, it.name)})
 
