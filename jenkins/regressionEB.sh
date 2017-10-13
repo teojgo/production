@@ -1,5 +1,4 @@
 #!/bin/bash -l
-PREFIX="$SCRATCH/${project_name}/${linkname}"
 export EASYBUILD_TMPDIR=$PREFIX/tmp
 export EASYBUILD_SOURCEPATH=$PREFIX/sources 
 status=0

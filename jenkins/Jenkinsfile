@@ -80,9 +80,13 @@ stage("Build Stage") {
                     def bashScript
                     def command
                     def unuse_flag = ''
+                    def working_dir = sh(returnStdOut: true, script: 'echo $PWD').trim()
+                    def scratch = sh(returnStdOut: true, script: 'echo $SCRATCH').trim()
+                    def prefix = "$scratch/$project_name/$machineLabel"
                     switch (params.jenkinsType) {
                         case "testingEB" :
                             bashScript = "testingEB.sh"
+                            prefix = "prefix/${commitHach[0..6]}"
                             break
                         case "productionEB":
                             bashScript = "productionEB.sh"
@@ -97,23 +101,21 @@ stage("Build Stage") {
                     }
                     
                     if (arch == "") {
-                        command = "\$(\$PWD)/jenkins-builds/production.sh --list=\$(\$PWD)/jenkins-builds/$machineLabel --prefix=\$(\$PREFIX) $unuse_flag"
+                        command = "$working_dir/jenkins-builds/production.sh --list=$working_dir/jenkins-builds/$machineLabel --prefix=$prefix $unuse_flag"
                     }
                     else {
-                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 \$(\$PWD)/jenkins-builds/production.sh --arch=$arch --list=\$(\$PWD)/jenkins-builds/$machineLabel --prefix=\$(\$PREFIX) $unuse_flag/ARCH/$arch --xalt=no"
+                        command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 $working_dir/jenkins-builds/production.sh --arch=$arch --list=$working_dir/jenkins-builds/$machineLabel --prefix=$prefix $unuse_flag/ARCH/$arch --xalt=no"
                     }
                      
                     println "Command to execute: $command"
-                    def bashCommand = """chmod +x \$PWD/jenkins/${bashScript}
-                                         \$PWD/jenkins/${bashScript}
+                    def bashCommand = """chmod +x $working_dir/jenkins/${bashScript}
+                                         $working_dir/jenkins/$bashScript
                                       """
                    /*------------------------------------------------------
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
-                    withEnv(["GIT_COMMIT=${commitHash[0..6]}",
-                             "command=${command}",
-                             "linkname=${machineLabel}",
-                             "project_name=${project_name}"]) {
+                    withEnv(["PREFIX=$prefix",
+                             "command=${command}"]) {
                               
                         sh bashCommand 
                     }
