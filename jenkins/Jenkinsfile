@@ -81,16 +81,13 @@ stage("Build Stage") {
                     def bashScript
                     switch (params.jenkinsType) {
                         case "testing" :
-                            command = machine.testCommand 
-                            bashScript = "testing.sh"
+                            bashScript = "testingEB.sh"
                             break
                         case "production":
-                            command = machine.productionCommand 
-                            bashScript = "production.sh"
+                            bashScript = "productionEB.sh"
                             break
                         case "regression":
-                            command = machine.regressionCommand 
-                            bashScript = "regression.sh"
+                            bashScript = "regressionEB.sh"
                             break
                         default:
                             println "Jenkins type not recognized aborting..."
@@ -107,8 +104,6 @@ stage("Build Stage") {
                     withEnv(["GIT_COMMIT=${commitHash[0..6]}",
                              "system=${machineName}",
                              "linkname=${machineLabel}",
-                             "command=${command}",
-                             "unuse_path=${machine.unuse_path}",
                              "ARCH=${arch}",
                              "project_name=${project_name}"]) {
                         sh bashCommand 
