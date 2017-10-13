@@ -80,8 +80,8 @@ stage("Build Stage") {
                     def bashScript
                     def command
                     def unuse_flag = ''
-                    def working_dir = sh(returnStdOut: true, script: 'echo $PWD').trim()
-                    def scratch = sh(returnStdOut: true, script: 'echo $SCRATCH').trim()
+                    def working_dir = sh(returnStdout: true, script: 'echo $PWD').trim()
+                    def scratch = sh(returnStdout: true, script: 'echo $SCRATCH').trim()
                     def prefix = "$scratch/$project_name/$machineLabel"
                     switch (params.jenkinsType) {
                         case "testingEB" :
