@@ -5,7 +5,7 @@ stage("Initialization") {
     node{
         def root_dir = pwd()
         methods = load("${root_dir}/jenkins/util.groovy")
-        switch (params.jenkinsType)
+        switch (params.jenkinsType) {
             case "testing" :
 
                 if (methods.checkWorkInProgress(env.ghprbPullTitle)) {
@@ -19,11 +19,12 @@ stage("Initialization") {
             default:
                 println "Project type not recognized, aborting..."
                 return
+        }
     }
 }
 
 def userMessage 
-switch (params.jenkinsType)
+switch (params.jenkinsType) {
     case "testing" :
         userMessage = env.ghprbPullTitle
         break
@@ -34,6 +35,7 @@ switch (params.jenkinsType)
     default:
         println "Project type not recognized, aborting..."
         return
+}
 
 def machineConfigurations = [] 
 def machinesList
