@@ -68,7 +68,7 @@ stage("Build Stage") {
             def machineLabel = machineName 
             def arch = architecture
             println "Architecture ${arch}"
-            if (part != "")  
+            if (arch != "")  
                 machineLabel = "${machineName}-${arch}"
             builds[machineLabel] = {
                 node(machineName) {
