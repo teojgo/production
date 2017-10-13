@@ -107,15 +107,14 @@ stage("Build Stage") {
                         command = "srun -u --constraint=$arch --job-name=$project_name --time=24:00:00 $working_dir/jenkins-builds/production.sh --arch=$arch --list=$working_dir/jenkins-builds/$machineLabel --prefix=$prefix $unuse_flag/ARCH/$arch --xalt=no"
                     }
                      
-                    println "Command to execute: $command"
-                    def bashCommand = """chmod +x $working_dir/jenkins/${bashScript}
+                    def bashCommand = """chmod +x $working_dir/jenkins/$bashScript
                                          $working_dir/jenkins/$bashScript
                                       """
                    /*------------------------------------------------------
                     ------------------------ SCRIPT ------------------------ 
                     -------------------------------------------------------*/
                     withEnv(["PREFIX=$prefix",
-                             "command=${command}"]) {
+                             "command=$command"]) {
                               
                         sh bashCommand 
                     }
