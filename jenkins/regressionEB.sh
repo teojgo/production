@@ -7,7 +7,7 @@ if [ -d $PREFIX ]; then
     rm -rf $PREFIX/*
 fi
 
-$command
+$COMMAND
 
 status=$[status+$?]
 
