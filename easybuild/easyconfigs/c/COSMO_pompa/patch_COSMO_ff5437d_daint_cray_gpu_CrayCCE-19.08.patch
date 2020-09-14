@@ -1,24 +1,16 @@
-diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
---- cosmo_pompa_orig/cosmo/Options	2020-09-14 09:28:43.519146000 +0200
-+++ cosmo_pompa/cosmo/Options	2020-09-14 09:31:41.992834000 +0200
+diff -Nru --ignore-space-change cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
+--- cosmo_pompa_orig/cosmo/Options	2020-09-14 11:36:49.654818000 +0200
++++ cosmo_pompa/cosmo/Options	2020-09-14 11:47:43.623048000 +0200
 @@ -1,5 +1,5 @@
  # compiler
 -F90      = ftn -D__CRAY_FORTRAN__
 +F90      = ftn -D__CRAY_FORTRAN__ -h system_alloc -add-rpath -L/opt/nvidia/cudatoolkit10/10.0.130_3.22-7.0.1.0_5.2__gdfb4ce5/lib64 -lcudart -lcublas
  COMPILER = cray
-
+ 
  # linker
-@@ -13,6 +13,6 @@
-
- INC     += -I$(MPICH_DIR)/include
-
--# ensure usage of cray c++ when compiling C/C++
-+# ensure usage of cray c++ when compiling C/C++
- #portable math functions
- CC = CC
-diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
---- cosmo_pompa_orig/cosmo/Options.cray.gpu	2020-09-14 09:28:43.536321000 +0200
-+++ cosmo_pompa/cosmo/Options.cray.gpu	2020-09-14 09:32:20.521317000 +0200
+diff -Nru --ignore-space-change cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
+--- cosmo_pompa_orig/cosmo/Options.cray.gpu	2020-09-14 11:36:49.642738000 +0200
++++ cosmo_pompa/cosmo/Options.cray.gpu	2020-09-14 11:48:09.397760000 +0200
 @@ -14,9 +14,6 @@
  FFLAGS  += -hadd_paren # automatically adds parenthesis to select associative operations
  FFLAGS  += -hacc # compile for GPU
@@ -26,89 +18,14 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray
 -#MED 26/11/2019>>
 -FFLAGS  += -h system_alloc -add-rpath
 -#MED<<
-
+ 
  # verbose compilation flags
  VFLAGS   = -v # show compilation information
-@@ -44,42 +41,42 @@
- # ===============================================================
-
- # reproducible flags for cray c++ compiler
--CFLAGS  = -eZ
--CFLAGS += -ec
--CFLAGS += -eC
--CFLAGS += -eI
--CFLAGS += -eF
--CFLAGS += -hflex_mp=intolerant
--CFLAGS += -hfp0
--CFLAGS += -hadd_paren
--CFLAGS += -hnoaggress
--CFLAGS += -hnoautothread
--CFLAGS += -hfusion0
--CFLAGS += -hnointrinsics
--CFLAGS += -hnopattern
--CFLAGS += -hthread0
--CFLAGS += -hunroll0
--CFLAGS += -e0
-+CFLAGS  = -eZ
-+CFLAGS += -ec
-+CFLAGS += -eC
-+CFLAGS += -eI
-+CFLAGS += -eF
-+CFLAGS += -hflex_mp=intolerant
-+CFLAGS += -hfp0
-+CFLAGS += -hadd_paren
-+CFLAGS += -hnoaggress
-+CFLAGS += -hnoautothread
-+CFLAGS += -hfusion0
-+CFLAGS += -hnointrinsics
-+CFLAGS += -hnopattern
-+CFLAGS += -hthread0
-+CFLAGS += -hunroll0
-+CFLAGS += -e0
- CFLAGS += -hacc
-
- # reproducible flags for cray fortran compiler
--RFLAGS  = -ffree
--RFLAGS += -N1023
--RFLAGS += -eF
--# RFLAGS += -O0
-+RFLAGS  = -ffree
-+RFLAGS += -N1023
-+RFLAGS += -eF
-+# RFLAGS += -O0
- RFLAGS += -O1
--RFLAGS += -eI
--RFLAGS += -hnosecond_underscore
--RFLAGS += -hadd_paren
--RFLAGS += -hfp0
--# RFLAGS += -hflex_mp=intolerant
--RFLAGS += -hflex_mp=strict
--RFLAGS += -ra
--RFLAGS += -hnoaggress
--RFLAGS += -hnoautothread
--RFLAGS += -hfusion0
--RFLAGS += -hnopattern
--RFLAGS += -e0
-+RFLAGS += -eI
-+RFLAGS += -hnosecond_underscore
-+RFLAGS += -hadd_paren
-+RFLAGS += -hfp0
-+# RFLAGS += -hflex_mp=intolerant
-+RFLAGS += -hflex_mp=strict
-+RFLAGS += -ra
-+RFLAGS += -hnoaggress
-+RFLAGS += -hnoautothread
-+RFLAGS += -hfusion0
-+RFLAGS += -hnopattern
-+RFLAGS += -e0
- RFLAGS += -hacc
-
- # ===============================================================
-diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
---- cosmo_pompa_orig/cosmo/Options.lib.gpu	2020-09-14 09:28:43.521130000 +0200
-+++ cosmo_pompa/cosmo/Options.lib.gpu	2020-09-14 09:35:27.151433000 +0200
+diff -Nru --ignore-space-change cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
+--- cosmo_pompa_orig/cosmo/Options.lib.gpu	2020-09-14 11:36:49.654233000 +0200
++++ cosmo_pompa/cosmo/Options.lib.gpu	2020-09-14 11:46:04.013422000 +0200
 @@ -2,9 +2,6 @@
-
+ 
  # global libraries and includes
  LIB      = $(LDFLAGS)
 -#MED 26/11/2019>>
@@ -116,15 +33,15 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
 -#MED<<
  INC      = -I.
  INC     += -I$(ROOT)/$(SRCDIR)
-
-@@ -21,35 +18,34 @@
+ 
+@@ -21,35 +18,35 @@
  MPII     = -D__MPICH2
-
+ 
  # Grib1 library
 -GRIBDWDL = -L$(INSTALL_DIR)/libgrib1 -lgrib1_$(COMPILER)
 +GRIBDWDL = -L${EBROOTLIBGRIB1_CRCLIM} -lgrib1_cray
  GRIBDWDI =
-
+ 
  # Grib-API library
 -GRIBAPI_VERSION = v1.13.1.2
 -GRIBAPIL = -L$(INSTALL_DIR)/libgrib_api/$(GRIBAPI_VERSION)/$(COMPILER)/lib -lgrib_api_f90 -lgrib_api -L$(INSTALL_DIR)/libjasper/lib -ljasper
@@ -132,27 +49,27 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
 +# GRIBAPI_VERSION = v1.13.1
 +GRIBAPIL = -L${EBROOTGRIB_API}/lib -lgrib_api_f90 -lgrib_api -L${EBROOTJASPER}/lib -ljasper
 +GRIBAPII = -I${EBROOTGRIB_API}/include
-
+ 
  # NetCDF library
--NETCDFL  =
--NETCDFI  =
+-NETCDFL  = 
+-NETCDFI  = 
 +NETCDFL  = -L${NETCDF_DIR}/lib
 +NETCDFI  = -I${NETCDF_DIR}/include
-
+ 
  # Synsat library
 -RTTOV7L  = -L$(INSTALL_DIR)/librttov7 -lrttov7_$(COMPILER)
 +#RTTOV7L  = -L$(INSTALL_DIR)/librttov7 -lrttov7_$(COMPILER)
  RTTOV7I  =
  RTTOV10L =
  RTTOV10I =
-
+ 
  # Serialization library
 -SERIALBOX  =
 -SERIALBOXL =
--SERIALBOXI =
 +SERIALBOX  = ${EBROOTSERIALBOX}
 +SERIALBOXL = -L${EBROOTSERIALBOX}/lib
-
+ SERIALBOXI =
+ 
  # STELLA library
 -STELLA   = $(STELLA_DIR)
 -STELLAL  = -L$(STELLA)/lib -lCommunicationFrameworkCUDA -ljson -lStellaCUDA -lgcl -lStellaUtils -lSharedInfrastructureCUDA -lstdc++
@@ -160,7 +77,7 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
 +STELLA   = ${EBROOTSTELLA}
 +STELLAL  = -L${EBROOTSTELLA}/lib -lCommunicationFrameworkCUDA -ljson -lStellaCUDA -lgcl -lStellaUtils -lSharedInfrastructureCUDA -lstdc++
 +STELLAI  = -I${EBROOTSTELLA}/include/STELLA
-
+ 
  # Dycore library
 -DYCORE   = $(DYCORE_DIR)
 -DYCOREL  = -L$(DYCORE)/lib -lDycoreWrapperCUDA -lDycoreCUDA
