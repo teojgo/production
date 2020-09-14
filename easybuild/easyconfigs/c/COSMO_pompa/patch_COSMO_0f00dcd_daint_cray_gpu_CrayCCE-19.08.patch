@@ -1,6 +1,6 @@
 diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
---- cosmo_pompa_orig/cosmo/Options	2020-09-14 09:28:43.519146000 +0200
-+++ cosmo_pompa/cosmo/Options	2020-09-14 09:31:41.992834000 +0200
+--- cosmo_pompa_orig/cosmo/Options	2020-09-14 11:36:49.654818000 +0200
++++ cosmo_pompa/cosmo/Options	2020-09-14 11:47:43.623048000 +0200
 @@ -1,5 +1,5 @@
  # compiler
 -F90      = ftn -D__CRAY_FORTRAN__
@@ -8,17 +8,9 @@ diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
  COMPILER = cray
 
  # linker
-@@ -13,6 +13,6 @@
-
- INC     += -I$(MPICH_DIR)/include
-
--# ensure usage of cray c++ when compiling C/C++
-+# ensure usage of cray c++ when compiling C/C++
- #portable math functions
- CC = CC
 diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
---- cosmo_pompa_orig/cosmo/Options.cray.gpu	2020-09-14 09:28:43.536321000 +0200
-+++ cosmo_pompa/cosmo/Options.cray.gpu	2020-09-14 09:32:20.521317000 +0200
+--- cosmo_pompa_orig/cosmo/Options.cray.gpu	2020-09-14 11:36:49.642738000 +0200
++++ cosmo_pompa/cosmo/Options.cray.gpu	2020-09-14 11:48:09.397760000 +0200
 @@ -14,9 +14,6 @@
  FFLAGS  += -hadd_paren # automatically adds parenthesis to select associative operations
  FFLAGS  += -hacc # compile for GPU
@@ -105,8 +97,8 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray
 
  # ===============================================================
 diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
---- cosmo_pompa_orig/cosmo/Options.lib.gpu	2020-09-14 09:28:43.521130000 +0200
-+++ cosmo_pompa/cosmo/Options.lib.gpu	2020-09-14 09:35:27.151433000 +0200
+--- cosmo_pompa_orig/cosmo/Options.lib.gpu	2020-09-14 11:36:49.654233000 +0200
++++ cosmo_pompa/cosmo/Options.lib.gpu	2020-09-14 11:46:04.013422000 +0200
 @@ -2,9 +2,6 @@
 
  # global libraries and includes
@@ -117,7 +109,7 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
  INC      = -I.
  INC     += -I$(ROOT)/$(SRCDIR)
 
-@@ -21,35 +18,34 @@
+@@ -21,35 +18,35 @@
  MPII     = -D__MPICH2
 
  # Grib1 library
@@ -149,9 +141,9 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
  # Serialization library
 -SERIALBOX  =
 -SERIALBOXL =
--SERIALBOXI =
 +SERIALBOX  = ${EBROOTSERIALBOX}
 +SERIALBOXL = -L${EBROOTSERIALBOX}/lib
+ SERIALBOXI =
 
  # STELLA library
 -STELLA   = $(STELLA_DIR)
