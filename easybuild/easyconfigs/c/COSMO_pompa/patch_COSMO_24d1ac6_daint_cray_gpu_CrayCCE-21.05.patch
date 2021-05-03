@@ -176,4 +176,3 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
 +DYCORE   = ${EBROOTDYCORE}
 +DYCOREL  = -L${EBROOTDYCORE}/lib -lDycoreWrapperCUDA -lDycoreCUDA
  DYCOREI  =
-Binary files cosmo_pompa_orig/.git/index and cosmo_pompa/.git/index differ
