@@ -1,7 +1,7 @@
 diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
---- cosmo_pompa_orig/cosmo/Options	2021-04-15 16:18:19.937169000 +0200
-+++ cosmo_pompa/cosmo/Options	2021-05-03 17:08:36.297209000 +0200
-@@ -1,17 +1,15 @@
+--- cosmo_pompa_orig/cosmo/Options	2021-05-03 17:40:24.556560000 +0200
++++ cosmo_pompa/cosmo/Options	2021-05-03 17:43:22.602465000 +0200
+@@ -1,17 +1,18 @@
  # compiler
 -F90      = ftn -D__CRAY_FORTRAN__
 +F90      = ftn -D__CRAY_FORTRAN__ -homp -h system_alloc -add-rpath -L$(CUDATOOLKIT_HOME)/lib64 -lcudart -lcublas
@@ -24,10 +24,13 @@ diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
 -CC = CC
 \ No newline at end of file
 +INC     += -I$(MPICH_DIR)/include
++
++# ensure usage of cray c++ when compiling C/C++
++#portable math functions
 +CC = CC
 diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
---- cosmo_pompa_orig/cosmo/Options.cray.gpu	2021-04-15 16:18:19.926491000 +0200
-+++ cosmo_pompa/cosmo/Options.cray.gpu	2021-05-03 17:09:37.417645000 +0200
+--- cosmo_pompa_orig/cosmo/Options.cray.gpu	2021-05-03 17:40:22.472252000 +0200
++++ cosmo_pompa/cosmo/Options.cray.gpu	2021-05-03 17:43:55.130895000 +0200
 @@ -14,9 +14,6 @@
  FFLAGS  += -hadd_paren # automatically adds parenthesis to select associative operations
  FFLAGS  += -hacc # compile for GPU
@@ -114,8 +117,8 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray
 
  # ===============================================================
 diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
---- cosmo_pompa_orig/cosmo/Options.lib.gpu	2021-04-15 16:18:19.910696000 +0200
-+++ cosmo_pompa/cosmo/Options.lib.gpu	2021-05-03 17:11:27.078983000 +0200
+--- cosmo_pompa_orig/cosmo/Options.lib.gpu	2021-05-03 17:40:22.479198000 +0200
++++ cosmo_pompa/cosmo/Options.lib.gpu	2021-05-03 17:46:37.655917000 +0200
 @@ -2,9 +2,6 @@
 
  # global libraries and includes
