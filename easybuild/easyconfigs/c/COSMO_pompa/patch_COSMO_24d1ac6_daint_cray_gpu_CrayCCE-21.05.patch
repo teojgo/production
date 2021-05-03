@@ -1,7 +1,7 @@
 diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
---- cosmo_pompa_orig/cosmo/Options	2019-11-29 09:56:39.000000000 +0100
-+++ cosmo_pompa/cosmo/Options	2019-11-29 16:38:58.000000000 +0100
-@@ -1,17 +1,18 @@
+--- cosmo_pompa_orig/cosmo/Options	2021-04-15 16:18:19.937169000 +0200
++++ cosmo_pompa/cosmo/Options	2021-05-03 17:08:36.297209000 +0200
+@@ -1,17 +1,15 @@
  # compiler
 -F90      = ftn -D__CRAY_FORTRAN__
 +F90      = ftn -D__CRAY_FORTRAN__ -homp -h system_alloc -add-rpath -L$(CUDATOOLKIT_HOME)/lib64 -lcudart -lcublas
@@ -24,13 +24,10 @@ diff -Nru cosmo_pompa_orig/cosmo/Options cosmo_pompa/cosmo/Options
 -CC = CC
 \ No newline at end of file
 +INC     += -I$(MPICH_DIR)/include
-+
-+# ensure usage of cray c++ when compiling C/C++
-+#portable math functions
 +CC = CC
 diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
---- cosmo_pompa_orig/cosmo/Options.cray.gpu	2019-11-29 09:56:39.000000000 +0100
-+++ cosmo_pompa/cosmo/Options.cray.gpu	2019-11-29 16:39:57.000000000 +0100
+--- cosmo_pompa_orig/cosmo/Options.cray.gpu	2021-04-15 16:18:19.926491000 +0200
++++ cosmo_pompa/cosmo/Options.cray.gpu	2021-05-03 17:09:37.417645000 +0200
 @@ -14,9 +14,6 @@
  FFLAGS  += -hadd_paren # automatically adds parenthesis to select associative operations
  FFLAGS  += -hacc # compile for GPU
@@ -41,9 +38,84 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray
 
  # verbose compilation flags
  VFLAGS   = -v # show compilation information
+@@ -44,42 +41,42 @@
+ # ===============================================================
+
+ # reproducible flags for cray c++ compiler
+-CFLAGS  = -eZ
+-CFLAGS += -ec
+-CFLAGS += -eC
+-CFLAGS += -eI
+-CFLAGS += -eF
+-CFLAGS += -hflex_mp=intolerant
+-CFLAGS += -hfp0
+-CFLAGS += -hadd_paren
+-CFLAGS += -hnoaggress
+-CFLAGS += -hnoautothread
+-CFLAGS += -hfusion0
+-CFLAGS += -hnointrinsics
+-CFLAGS += -hnopattern
+-CFLAGS += -hthread0
+-CFLAGS += -hunroll0
+-CFLAGS += -e0
++CFLAGS  = -eZ
++CFLAGS += -ec
++CFLAGS += -eC
++CFLAGS += -eI
++CFLAGS += -eF
++CFLAGS += -hflex_mp=intolerant
++CFLAGS += -hfp0
++CFLAGS += -hadd_paren
++CFLAGS += -hnoaggress
++CFLAGS += -hnoautothread
++CFLAGS += -hfusion0
++CFLAGS += -hnointrinsics
++CFLAGS += -hnopattern
++CFLAGS += -hthread0
++CFLAGS += -hunroll0
++CFLAGS += -e0
+ CFLAGS += -hacc
+
+ # reproducible flags for cray fortran compiler
+-RFLAGS  = -ffree
+-RFLAGS += -N1023
+-RFLAGS += -eF
+-# RFLAGS += -O0
++RFLAGS  = -ffree
++RFLAGS += -N1023
++RFLAGS += -eF
++# RFLAGS += -O0
+ RFLAGS += -O1
+-RFLAGS += -eI
+-RFLAGS += -hnosecond_underscore
+-RFLAGS += -hadd_paren
+-RFLAGS += -hfp0
+-# RFLAGS += -hflex_mp=intolerant
+-RFLAGS += -hflex_mp=strict
+-RFLAGS += -ra
+-RFLAGS += -hnoaggress
+-RFLAGS += -hnoautothread
+-RFLAGS += -hfusion0
+-RFLAGS += -hnopattern
+-RFLAGS += -e0
++RFLAGS += -eI
++RFLAGS += -hnosecond_underscore
++RFLAGS += -hadd_paren
++RFLAGS += -hfp0
++# RFLAGS += -hflex_mp=intolerant
++RFLAGS += -hflex_mp=strict
++RFLAGS += -ra
++RFLAGS += -hnoaggress
++RFLAGS += -hnoautothread
++RFLAGS += -hfusion0
++RFLAGS += -hnopattern
++RFLAGS += -e0
+ RFLAGS += -hacc
+
+ # ===============================================================
 diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
---- cosmo_pompa_orig/cosmo/Options.lib.gpu	2019-11-29 09:56:39.000000000 +0100
-+++ cosmo_pompa/cosmo/Options.lib.gpu	2019-11-29 16:37:34.000000000 +0100
+--- cosmo_pompa_orig/cosmo/Options.lib.gpu	2021-04-15 16:18:19.910696000 +0200
++++ cosmo_pompa/cosmo/Options.lib.gpu	2021-05-03 17:11:27.078983000 +0200
 @@ -2,9 +2,6 @@
 
  # global libraries and includes
@@ -104,3 +176,4 @@ diff -Nru cosmo_pompa_orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.g
 +DYCORE   = ${EBROOTDYCORE}
 +DYCOREL  = -L${EBROOTDYCORE}/lib -lDycoreWrapperCUDA -lDycoreCUDA
  DYCOREI  =
+Binary files cosmo_pompa_orig/.git/index and cosmo_pompa/.git/index differ
