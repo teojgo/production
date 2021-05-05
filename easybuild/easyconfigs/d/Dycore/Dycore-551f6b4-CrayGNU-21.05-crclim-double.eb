@@ -21,7 +21,7 @@ dependencies = [
     ('STELLA', '4a5f9c5', '-crclim-double'),
 ]
 
-configopts = "-DCMAKE_BUILD_TYPE=Release -DSINGLEPRECISION=OFF -DCUDA_BACKEND=ON -DSTELLA_DIR=${EBROOTSTELLA} -DBITREPRO=OFF "
+configopts = "-DCMAKE_BUILD_TYPE=Release -DSINGLEPRECISION=OFF -DCUDA_BACKEND=OFF -DSTELLA_DIR=${EBROOTSTELLA} -DBITREPRO=OFF "
 
 srcdir = '%(namelower)s'
 separate_build_dir = True
