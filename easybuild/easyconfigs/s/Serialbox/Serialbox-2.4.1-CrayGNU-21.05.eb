@@ -18,6 +18,8 @@ builddependencies = [
     ('Boost', '1.67.0'),
 ]
 
+preconfigopts = "module swap gcc gcc/8.3.0 &&"
+prebuildopts = "module swap gcc gcc/8.3.0 &&"
 configopts = '-DSERIALBOX_ENABLE_FORTRAN=ON'
 
 parallel = 4

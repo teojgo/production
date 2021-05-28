@@ -19,6 +19,9 @@ dependencies = [
     ('zlib', '1.2.11', '', True),
 ]
 
+preconfigopts = "module swap gcc gcc/8.3.0 &&"
+prebuildopts = "module swap gcc gcc/8.3.0 &&"
+
 configopts = " --without-libraries=python"
 
 boost_mpi = True
