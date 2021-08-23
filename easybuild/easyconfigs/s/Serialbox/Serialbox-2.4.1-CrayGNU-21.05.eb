@@ -22,7 +22,7 @@ preconfigopts = "module swap gcc gcc/8.3.0 &&"
 prebuildopts = "module swap gcc gcc/8.3.0 &&"
 configopts = '-DSERIALBOX_ENABLE_FORTRAN=ON'
 
-parallel = 4
+parallel = 1
 
 separate_build_dir = True
 
