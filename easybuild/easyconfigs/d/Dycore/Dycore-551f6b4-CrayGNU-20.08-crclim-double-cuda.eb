@@ -22,6 +22,9 @@ dependencies = [
     ('STELLA', '4a5f9c5', '-crclim-double-cuda'),
 ]
 
+preconfigopts = "module swap gcc gcc/8.1.0 &&"
+prebuildopts = "module swap gcc gcc/8.1.0 &&"
+
 configopts = "-DCMAKE_BUILD_TYPE=Release -DSINGLEPRECISION=OFF -DCUDA_BACKEND=ON -DSTELLA_DIR=${EBROOTSTELLA} -DBITREPRO=OFF "
 
 srcdir = '%(namelower)s'

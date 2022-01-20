@@ -23,6 +23,9 @@ dependencies = [
     ('Boost', '1.67.0'),
 ]
 
+preconfigopts = "module swap gcc gcc/8.1.0 &&"
+prebuildopts = "module swap gcc gcc/8.1.0 &&"
+
 configopts = "-DBoost_INCLUDE_DIR=${EBROOTBOOST}/include -DCMAKE_BUILD_TYPE=Release -DX86_BACKEND=ON -DSINGLEPRECISION=OFF -DCUDA_BACKEND=ON -DCUDA_COMPUTE_CAPABILITY=sm_60 -DSTELLA_KSIZE=60 -DSTELLA_KFLAT=19 -DENABLE_OPENMP=OFF -DGCL=ON -DSTELLA_BITREPRO=OFF "
 
 separate_build_dir = True
