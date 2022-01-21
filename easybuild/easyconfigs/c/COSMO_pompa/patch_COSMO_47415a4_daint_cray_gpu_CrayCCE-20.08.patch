@@ -1,0 +1,93 @@
+diff -Nruw cosmo_pompa.orig/cosmo/Options cosmo_pompa/cosmo/Options
+--- cosmo_pompa.orig/cosmo/Options	2022-01-21 14:05:45.818062000 +0100
++++ cosmo_pompa/cosmo/Options	2022-01-21 14:29:12.308832000 +0100
+@@ -1,17 +1,17 @@
+ # compiler
+-F90      = ftn -D__CRAY_FORTRAN__
++F90      = ftn -D__CRAY_FORTRAN__ -homp -h system_alloc -add-rpath -L$(CUDATOOLKIT_HOME)/lib64 -lcudart -lcublas
+ COMPILER = cray
+ 
+ # linker
+ LD       = $(F90)
+ 
+--include $(ROOT)/Options.$(COMPILER).cpu
++-include $(ROOT)/Options.$(COMPILER).gpu
+ 
+ #PFLAGS  += -DSINGLEPRECISION # run model in single precision
+ 
+--include $(ROOT)/Options.lib.cpu
++-include $(ROOT)/Options.lib.gpu
+ 
+-# bit-repro math
+-CMATH_DIR=/users/charpill/prg/mch/cmath
+-FMATH_DIR=/users/charpill/prg/mch/fmath
++INC     += -I$(MPICH_DIR)/include
++
++# ensure usage of cray c++ when compiling C/C++
+ CC = CC
+\ No newline at end of file
+diff -Nruw cosmo_pompa.orig/cosmo/Options.cray.gpu cosmo_pompa/cosmo/Options.cray.gpu
+--- cosmo_pompa.orig/cosmo/Options.cray.gpu	2022-01-21 14:05:44.114089000 +0100
++++ cosmo_pompa/cosmo/Options.cray.gpu	2022-01-21 14:29:21.733237000 +0100
+@@ -15,9 +15,6 @@
+ FFLAGS  += -hadd_paren # automatically adds parenthesis to select associative operations
+ FFLAGS  += -hacc # compile for GPU
+ FFLAGS  += -ra # generates listing
+-#MED 26/11/2019>>
+-FFLAGS  += -h system_alloc -add-rpath
+-#MED<<
+ 
+ # verbose compilation flags
+ VFLAGS   = -v # show compilation information
+diff -Nruw cosmo_pompa.orig/cosmo/Options.lib.gpu cosmo_pompa/cosmo/Options.lib.gpu
+--- cosmo_pompa.orig/cosmo/Options.lib.gpu	2022-01-21 14:05:45.814656000 +0100
++++ cosmo_pompa/cosmo/Options.lib.gpu	2022-01-21 14:32:31.853294000 +0100
+@@ -18,34 +18,34 @@
+ MPII     = -D__MPICH2
+ 
+ # Grib1 library
+-GRIBDWDL = -L$(INSTALL_DIR)/libgrib1/lib -lgrib1_$(COMPILER)
++GRIBDWDL = -L${EBROOTLIBGRIB1_CRCLIM} -lgrib1_cray
+ GRIBDWDI =
+ 
+ # Grib-API library
+-GRIBAPIL = -L$(INSTALL_DIR)/eccodes/lib64 -leccodes_f90 -leccodes -L$(INSTALL_DIR)/jasper/lib64 -ljasper
+-GRIBAPII = -I$(INSTALL_DIR)/eccodes/include
++# GRIBAPI_VERSION = v1.13.1
++GRIBAPIL = -L${EBROOTGRIB_API}/lib -lgrib_api_f90 -lgrib_api -L${EBROOTJASPER}/lib -ljasper
++GRIBAPII = -I${EBROOTGRIB_API}/include
+ 
+ # NetCDF library
+-NETCDFL  = 
+-NETCDFI  = 
++NETCDFL  = -L${NETCDF_DIR}/lib
++NETCDFI  = -I${NETCDF_DIR}/include
+ 
+ # Synsat library
+-RTTOV7L  = -L$(INSTALL_DIR)/librttov7 -lrttov7_$(COMPILER)
++# RTTOV7L  = -L$(INSTALL_DIR)/librttov7 -lrttov7_$(COMPILER)
+ RTTOV7I  =
+ RTTOV10L =
+ RTTOV10I =
+ 
+ # Serialization library
+-SERIALBOX  =
+-SERIALBOXL =
+-SERIALBOXI =
++SERIALBOX  = ${EBROOTSERIALBOX}
++SERIALBOXL = -L${EBROOTSERIALBOX}/lib
+ 
+ # STELLA library
+-STELLA   = $(STELLA_DIR)
+-STELLAL  = -L$(STELLA)/lib -lCommunicationFrameworkCUDA -ljson -lStellaCUDA -lgcl -lStellaUtils -lSharedInfrastructureCUDA -lstdc++
+-STELLAI  =
++STELLA   = ${EBROOTSTELLA}
++STELLAL  = -L${EBROOTSTELLA}/lib -lCommunicationFrameworkCUDA -ljson -lStellaCUDA -lgcl -lStellaUtils -lSharedInfrastructureCUDA -lstdc++
++STELLAI  = -I${EBROOTSTELLA}/include/STELLA
+ 
+ # Dycore library
+-DYCORE   = $(DYCORE_DIR)
+-DYCOREL  = -L$(DYCORE)/lib -lDycoreWrapperCUDA -lDycoreCUDA
++DYCORE   = ${EBROOTDYCORE}
++DYCOREL  = -L${EBROOTDYCORE}/lib -lDycoreWrapperCUDA -lDycoreCUDA
+ DYCOREI  =
